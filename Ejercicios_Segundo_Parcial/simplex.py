@@ -80,9 +80,3 @@ def simplex(A,b,c):
         print(indexes) 
     return indexes,b
 
-A = [[1.0,1.0,1.0,1.0,0.0,0.0],[2.0,1.0,-1.0,0.0,1.0,0.0],[-1.0,3.0,0.0,0.0,0.0,1.0]]
-b = [12.0,6.0,9.0]
-c = [1.0,-2.0,1.0,0.0,0.0,0.0]
-base,sol = simplex(A,b,c)
-print("Base:",base)
-print("Solucion:",sol)
