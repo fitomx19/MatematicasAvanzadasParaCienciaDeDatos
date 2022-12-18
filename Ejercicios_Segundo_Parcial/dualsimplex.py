@@ -76,23 +76,19 @@ class SimplexMethod:
                 return False  # fallido para borrar
             self.gauss(row, column)  # aplicando el metodo de gauss
             self.calculate_f()
-            print('\nLeaving variable has been removed in row:', row + 1)
+            print('Variable fue removida por:', row + 1)
             self.print_table()
 
 
-    def gauss(self, row, column):  # column --> leaving variable row -->entering variable
-        # self.table[row][column] - pivot element
+    def gauss(self, row, column):  
         self.table[row] /= self.table[row][column]
-        #self.table[row] - leaving var row
+       
         for i in range(self.restrictions_count):
-            if i != row:  # neglecting the leaving variable row
-                # entering variable ooda corresponding col
+            if i != row:  
                 self.table[i] -= self.table[row] * self.table[i][column]
-
-        # changing the the variable number in table based on leaving and entering variable
         self.basis[row] = column
 
-    # calculation of F values
+    
 
     def calculate_f(self):
         for i in range(self.variables_count + 1):
@@ -101,19 +97,17 @@ class SimplexMethod:
             for j in range(self.restrictions_count):
                 self.f[i] += self.c[self.basis[j]] * self.table[j][i]
 
-    # calculation of simplex relations for column column
 
     def get_relations(self, column):
         q = []
 
         for i in range(self.restrictions_count):
             if self.table[i][column] == 0:
-                # if any value results in infinity we return it and stop
                 q.append(np.inf)
 
             else:
                 q_i = self.table[i][-1] / \
-                    self.table[i][column]  # ratio calculation
+                    self.table[i][column] 
                 q.append(q_i if q_i >= 0 else np.inf)
 
         return q
@@ -134,8 +128,8 @@ class SimplexMethod:
         self.calculate_f()
         self.print_table()
 
-        if not self.remove_negative_b():  # if the b value is not there then it is infeasible
-            print('Solve does not exist')
+        if not self.remove_negative_b():  # 
+            print('No existe la solucion')
             return False
 
         iteration = 1
@@ -145,26 +139,24 @@ class SimplexMethod:
             print('\nIteration', iteration)
             self.print_table()
 
-            # if the plan is optimal
+         
             if all(fi >= 0 if self.mode == MAX_MODE else fi <= 0 for fi in self.f[:-1]):
-                break  # then we finish the work
+                break  
 
             column = (np.argmin if self.mode == MAX_MODE else np.argmax)(
-                self.f[:-1])  # we get the resolving column
-            # we get simplex relations for the found column
+                self.f[:-1]) 
+       
             q = self.get_relations(column)
 
-            if all(qi == np.inf for qi in q):  # if the resolving string could not be found
-                # we inform you that there is no solution
-                print('Solve does not exist')
+            if all(qi == np.inf for qi in q):  
+                print('No existe la relacion')
                 return False
 
-            self.gauss(np.argmin(q), column)  # performing a Gaussian exception
+            self.gauss(np.argmin(q), column)  
             iteration += 1
 
-        return True  # there is a solution
+        return True 
 
-    # simplex table output
     def print_table(self):
         print('     |' + ''.join(['   y%-3d |' % (i + 1)
               for i in range(self.variables_count)]) + '    b   |')
@@ -186,7 +178,7 @@ class SimplexMethod:
 
         return '%.2fy%d' % (ai, i + 1)
 
-    # salida de la tarea
+    # output of the task
     def print_task(self, full=False):
         print(' + '.join(['%.2fy%d' % (ci, i + 1) for i, ci in enumerate(
             self.c[:self.main_variables_count]) if ci != 0]), '-> ', self.mode)
@@ -199,25 +191,8 @@ class SimplexMethod:
                 print(' + '.join([self.print_coef(ai, i) for i, ai in enumerate(
                     row[:self.main_variables_count]) if ai != 0]), '<=', row[-1])
 
-
-# traduciendo a una tarea dual
-
-
-def make_dual(a, b, c):
-    return -a.T, -c, b
+# translation into a dual task
 
 
-c = np.array([1, -7, 10, -3])  # RHS
-a = np.array([
-    [1, -1, 1, 0],
-    [1, -1, 2, -1]
-])
-
-b = np.array([-3, -2])  # objective fn
-
-a, b, c = make_dual(a, b, c)  # turned into a dual task
-simplex = SimplexMethod(c, a, b, MAX_MODE)  # turn into max mode
-
-print("Dual task:")
-simplex.print_task()
-simplex.solve()
+    def make_dual(a, b, c):
+        return -a.T, -c, b
